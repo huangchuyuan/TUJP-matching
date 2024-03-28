@@ -28,7 +28,7 @@ def list2dict(list, translation, is_name):
             somedict[i] = ts.translate_text(str(list[i]).replace("\u3000",""),  translator="google", from_language="auto", to_language="en").lower().replace(" ","").split(",")
     elif translation == False and is_name == True:
         for i in range(len(list)):
-            somedict[i] = [str(list[i]).replace("\u3000","")]
+            somedict[i] = [str(list[i]).replace("\u3000","").replace(","," ")]
     elif translation == False and is_name == False:
         for i in range(len(list)):
             somedict[i] = [str(list[i]).replace("\u3000","").lower()]
