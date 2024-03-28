@@ -115,17 +115,13 @@ def matching():
             matched[i].append(popped_student_email[0])
 
             
-    
-    # Output matching results into a txt file
-    with open('testout.txt', 'w', encoding="utf-8") as f:
-        for i in range(len(matched)):   
-            print("-------------------------------------------------------------------------------", file=f) 
-            print(f"Buddy: \n{matched[i][0]}  |  {matched[i][1]}\n", file=f)
-            print(f"TUJP student:", file=f)
-            for j in range(0, len(matched[i]) - 2, 2):
-                print(f"{matched[i][j+2]}  |  {matched[i][j+3]}", file=f)
 
-            print("-------------------------------------------------------------------------------", file=f) 
+    with open('testout.csv', 'w', encoding="utf-8") as f:
+        print("Buddy name, Buddy email, Student name and Student email", file=f)
+        for i in range(len(matched)):    
+            print(f"{",".join(matched[i])}", file=f)
+            
+             
 
 
 
