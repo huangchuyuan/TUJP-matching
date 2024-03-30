@@ -162,7 +162,7 @@ def matching(buddy_file, student_file):
             print(f"{",".join(matched[i])}", file=f)
             
     print("Outputted results in file: matching_results.csv")
-    time.sleep(3)
+    time.sleep(5)
     
 # Main function            
 def main():   
