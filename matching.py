@@ -1,23 +1,52 @@
 import pandas as pd
 import translators as ts
+import tkinter as tk
+from tkinter import filedialog
+from tkinter import *
+import time
+
+# Function that prompts user to import a file
+def prompt_file():
+    """Create a Tk file dialog and cleanup when finished"""
+    top = tk.Tk()
+    top.wm_attributes("-topmost", 1)
+    top.withdraw()  # hide window
+    file_name = filedialog.askopenfilename(parent=top, title="Select a file", filetypes=[("Excel files", "*.xlsx"),("All files", "*.*")])
+    top.destroy()
+    return file_name
+
+# Function that outputs imported files path for buddy and TUJP student files 
+def import_files():
+    has_imported_buddy = False
+    while has_imported_buddy == False:
+        print("Press enter to import buddy's response excel file")
+        input1 = input()
+        if input1 == "":
+            buddy_file = prompt_file()
+            if buddy_file == "":
+                continue
+            else:
+                has_imported_buddy = True
+        else:
+            print("Invalid input, please press enter\n")
+        
+    has_imported_student = False
+    while has_imported_student == False:
+        print("Press enter to import TUJP student's response excel file")
+        input2 = input()
+        if input2 == "":
+            student_file = prompt_file()
+            if student_file == "":
+                continue
+            else:
+                has_imported_student = True
+        else:
+            print("Invalid input, please press enter\n")
+
+    return buddy_file, student_file
+
 
 #_ = ts.preaccelerate_and_speedtest()
-
-# Read excel data 
-buddy_excel_data_df = pd.read_excel("2023  TUJP バディマッティング（回答） - Copy.xlsx", sheet_name="Form Responses 1")
-student_excel_data_df = pd.read_excel("test_student_response.xlsx", sheet_name="Form Responses 1")
-
-# Preprocessing of dataframe
-buddy_preprocessed_df = buddy_excel_data_df.rename(columns={"マッチングの参考のため、興味のある事柄についてお答えください。":"hobbies",
-                                                 "マッチングの参考のため、第二外国語または学習中の言語についてお答えください。":"language",
-                                                 "氏名":"name",
-                                                 "性別":"gender",
-                                                 "メールアドレス":"email"})
-student_preprocessed_df = student_excel_data_df.rename(columns={"マッチングの参考のため、興味のある事柄についてお答えください。":"hobbies",
-                                                 "マッチングの参考のため、第二外国語または学習中の言語についてお答えください。":"language",
-                                                 "氏名のアルファベット表記":"name",
-                                                 "性別":"gender",
-                                                 "メールアドレス":"email"})
 
 # Function that converts list to dict 
 def list2dict(list, translation, is_name):
@@ -36,30 +65,41 @@ def list2dict(list, translation, is_name):
     return somedict
 
 
-# Prepare dict for each category of matching form (for buddy and TUJP students)
-buddy_hobbies = list2dict(buddy_preprocessed_df["hobbies"], translation=True, is_name=False)
-buddy_languages = list2dict(buddy_preprocessed_df["language"], translation=True, is_name=False)
-buddy_gender = list2dict(buddy_preprocessed_df["gender"], translation=True, is_name=False)
-buddy_name = list2dict(buddy_preprocessed_df["name"], translation=False, is_name=True)
-buddy_email = list2dict(buddy_preprocessed_df["email"], translation=False, is_name=False)
 
-student_hobbies = list2dict(student_preprocessed_df["hobbies"], translation=True, is_name=False)
-student_languages = list2dict(student_preprocessed_df["language"], translation=True, is_name=False)
-student_gender = list2dict(student_preprocessed_df["gender"], translation=False, is_name=False)
-student_name = list2dict(student_preprocessed_df["name"], translation=False, is_name=True)
-student_email = list2dict(student_preprocessed_df["email"], translation=False, is_name=False)
+# Function that does the matching
+def matching(buddy_file, student_file):
 
+    print("Reading files and converting language...")
+    # Read excel data 
+    buddy_excel_data_df = pd.read_excel(buddy_file, sheet_name="Form Responses 1")
+    student_excel_data_df = pd.read_excel(student_file, sheet_name="Form Responses 1")
 
-# Function that checks if only one gender is remaining in the remaining unmatched TUJP student list
-def check_gender(gender_list):
-    if ("male" in gender_list or "Male" in gender_list) and ("female" in gender_list or "Female" in gender_list):
-        return False
-    else:
-        return True
+    # Preprocessing of dataframe
+    buddy_preprocessed_df = buddy_excel_data_df.rename(columns={"マッチングの参考のため、興味のある事柄についてお答えください。":"hobbies",
+                                                    "マッチングの参考のため、第二外国語または学習中の言語についてお答えください。":"language",
+                                                    "氏名":"name",
+                                                    "性別":"gender",
+                                                    "メールアドレス":"email"})
+    student_preprocessed_df = student_excel_data_df.rename(columns={"マッチングの参考のため、興味のある事柄についてお答えください。":"hobbies",
+                                                    "マッチングの参考のため、第二外国語または学習中の言語についてお答えください。":"language",
+                                                    "氏名のアルファベット表記":"name",
+                                                    "性別":"gender",
+                                                    "メールアドレス":"email"})
+    
+    # Prepare dict for each category of matching form (for buddy and TUJP students)
+    buddy_hobbies = list2dict(buddy_preprocessed_df["hobbies"], translation=True, is_name=False)
+    buddy_languages = list2dict(buddy_preprocessed_df["language"], translation=True, is_name=False)
+    buddy_gender = list2dict(buddy_preprocessed_df["gender"], translation=True, is_name=False)
+    buddy_name = list2dict(buddy_preprocessed_df["name"], translation=False, is_name=True)
+    buddy_email = list2dict(buddy_preprocessed_df["email"], translation=False, is_name=False)
 
+    student_hobbies = list2dict(student_preprocessed_df["hobbies"], translation=True, is_name=False)
+    student_languages = list2dict(student_preprocessed_df["language"], translation=True, is_name=False)
+    student_gender = list2dict(student_preprocessed_df["gender"], translation=False, is_name=False)
+    student_name = list2dict(student_preprocessed_df["name"], translation=False, is_name=True)
+    student_email = list2dict(student_preprocessed_df["email"], translation=False, is_name=False)
 
-# Main function that does the matching
-def matching():
+    print("Start matching...")
     # Prepare dict to store matched buddy and TUJP students
     matched = {}
     index_left = [x for x in range(len(student_name))]
@@ -116,13 +156,24 @@ def matching():
 
             
 
-    with open('testout.csv', 'w', encoding="utf-8") as f:
+    with open('matching_results.csv', 'w', encoding="utf-8") as f:
         print("Buddy name, Buddy email, Student name and Student email", file=f)
         for i in range(len(matched)):    
             print(f"{",".join(matched[i])}", file=f)
             
-             
+    print("Outputted results in file: matching_results.csv")
+    time.sleep(3)
+    
+# Main function            
+def main():   
+    try:
+        buddy_file, student_file = import_files()
+        matching(buddy_file=buddy_file, student_file=student_file)
+    except Exception as e:
+        print('Unexpected error:' + str(e))
+        print("\nPress Ctrl + C to exit program")         
+        time.sleep(60)    
 
 
-
-matching()
+if __name__ == "__main__":
+    main()
