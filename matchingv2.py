@@ -4,6 +4,8 @@ from tkinter import filedialog
 from tkinter import *
 import time
 
+#Set-ExecutionPolicy Unrestricted -Scope Process   
+
 # Function that prompts user to import a file
 def prompt_file():
     """Create a Tk file dialog and cleanup when finished"""
